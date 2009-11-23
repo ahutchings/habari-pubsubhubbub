@@ -47,35 +47,35 @@ class PubSubHubbub extends Plugin
     public function action_plugin_activation($file)
     {
         if ($file != str_replace('\\','/', $this->get_file())) {
-        	return;
+            return;
         }
 
-    	foreach (self::default_options() as $name => $value) {
-			if (Options::get("pubsubhubbub__$name") == null) {
-				Options::set("pubsubhubbub__$name", $value);
-			}
-		}
+        foreach (self::default_options() as $name => $value) {
+            if (Options::get("pubsubhubbub__$name") == null) {
+                Options::set("pubsubhubbub__$name", $value);
+            }
+        }
     }
 
-   	public function alias()
-   	{
-		return array(
-			'post_to_endpoints' => array(
-				'action_post_insert_after',
-				'action_post_publish_after',
-				'action_post_update_after'
-			)
-		);
-   	}
+    public function alias()
+    {
+        return array(
+            'post_to_endpoints' => array(
+                'action_post_insert_after',
+                'action_post_publish_after',
+                'action_post_update_after'
+            )
+        );
+    }
 
     public function post_to_endpoints(Post $post)
     {
-		$feeds = array(URL::get('atom_feed'));
+        $feeds = array(URL::get('atom_feed'));
 
-		foreach (Options::get('pubsubhubbub__endpoints') as $endpoint) {
-	        $p = new Publisher($endpoint);
-        	$p->publish_update($feeds);
-		}
+        foreach (Options::get('pubsubhubbub__endpoints') as $endpoint) {
+            $p = new Publisher($endpoint);
+            $p->publish_update($feeds);
+        }
     }
 
     /**
@@ -86,17 +86,17 @@ class PubSubHubbub extends Plugin
     private static function default_options()
     {
         return array(
-        	'endpoints' => array("http://pubsubhubbub.appspot.com")
+            'endpoints' => array("http://pubsubhubbub.appspot.com")
         );
     }
 
     public function action_atom_create_wrapper($xml)
     {
-    	foreach (Options::get('pubsubhubbub__endpoints') as $endpoint) {
-			$link = $xml->addChild('link');
-			$link->addAttribute('rel', 'hub');
-			$link->addAttribute('href', $endpoint);
-	    }
+        foreach (Options::get('pubsubhubbub__endpoints') as $endpoint) {
+            $link = $xml->addChild('link');
+            $link->addAttribute('rel', 'hub');
+            $link->addAttribute('href', $endpoint);
+        }
     }
 }
 
